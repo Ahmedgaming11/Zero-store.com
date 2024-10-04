@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لعبة السلم والثعبان</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+        }
+        #board {
+            display: grid;
+            grid-template-columns: repeat(10, 50px);
+            grid-template-rows: repeat(10, 50px);
+            margin: 20px auto;
+            gap: 1px;
+            border: 5px solid #333;
+            background-color: #eee;
+        }
+        .cell {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            font-size: 20px;
+        }
+        .player {
+            background-color: #ffcc00;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+        }
+        #rollButton {
+            margin: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #status {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>لعبة السلم والثعبان</h1>
+<div id="board"></div>
+<button id="rollButton">رمي النرد</button>
+<div id="status"></div>
+
+<script>
+    const boardSize = 100;
+    let playerPosition = 0;
+
+    const snakes = {
+        16: 6, 47: 26, 49: 11, 56: 53, 62: 19, 64: 60, 87: 24, 93: 73, 95: 75
+    };
+
+    const ladders = {
+        1: 38, 4: 14, 9: 31, 21: 42, 28: 84, 36: 44, 51: 67, 71: 91, 80: 100
+    };
+
+    const board = document.getElementById('board');
+    const rollButton = document.getElementById('rollButton');
+    const status = document.getElementById('status');
+
+    function createBoard() {
+        for (let i = boardSize; i >= 1; i--) {
+            const cell = document.createElement('div');
+            cell.classList.add('cell');
+            cell.textContent = i;
+            board.appendChild(cell);
+        }
+    }
+
+    function updateBoard() {
+        const cells = document.querySelectorAll('.cell');
+        cells.forEach(cell => {
+            cell.innerHTML = ''; // Clear existing player indicators
+        });
+        if (playerPosition < boardSize) {
+            cells[playerPosition].innerHTML = '<div class="player"></div>';
+        } else {
+            status.textContent = 'لقد فزت!';
+            rollButton.disabled = true;
+        }
+    }
+
+    function rollDice() {
+        const diceValue = Math.floor(Math.random() * 6) + 1;
+        status.textContent = `رمي النرد: ${diceValue}`;
+        movePlayer(diceValue);
+    }
+
+    function movePlayer(steps) {
+        playerPosition += steps;
+        if (playerPosition > boardSize) {
+            playerPosition = boardSize; // لا تتجاوز 100
+        }
+        playerPosition = snakes[playerPosition] || ladders[playerPosition] || playerPosition; // التحرك على الثعابين والسلالم
+        updateBoard();
+    }
+
+    rollButton.addEventListener('click', rollDice);
+
+    createBoard();
+    updateBoard();
+</script>
+
+</body>
+</html>
